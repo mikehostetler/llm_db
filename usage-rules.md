@@ -1,4 +1,4 @@
-# LLMModels Usage Rules
+# LLM Models Usage Rules
 
 This document defines how AI coding assistants should interact with the `llm_models` library.
 

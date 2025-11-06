@@ -22,7 +22,7 @@ defmodule LLMModels.MixProject do
       ],
 
       # Documentation
-      name: "LLMModels",
+      name: "LLM Models",
       source_url: @source_url,
       homepage_url: @source_url,
       source_ref: "v#{@version}",

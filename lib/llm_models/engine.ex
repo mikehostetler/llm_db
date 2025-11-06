@@ -438,22 +438,24 @@ defmodule LLMModels.Engine do
     |> Map.values()
   end
 
-  # Deep merge with special list handling using DeepMerge
+  # Deep merge with special list handling
   defp deep_merge_with_list_rules(left, right) when is_map(left) and is_map(right) do
-    DeepMerge.deep_merge(left, right, &model_merge_resolver/2)
+    LLMModels.DeepMergeShim.deep_merge(left, right, &model_merge_resolver/3)
   end
 
-  defp model_merge_resolver(left_val, right_val) when is_list(left_val) and is_list(right_val) do
+  defp model_merge_resolver(_key, left_val, right_val)
+       when is_list(left_val) and is_list(right_val) do
     # For lists: replace (right wins)
     right_val
   end
 
-  defp model_merge_resolver(left_val, right_val) when is_map(left_val) and is_map(right_val) do
+  defp model_merge_resolver(_key, left_val, right_val)
+       when is_map(left_val) and is_map(right_val) do
     # For maps: continue deep merge
     DeepMerge.continue_deep_merge()
   end
 
-  defp model_merge_resolver(_left_val, right_val) do
+  defp model_merge_resolver(_key, _left_val, right_val) do
     # For scalars: right wins
     right_val
   end

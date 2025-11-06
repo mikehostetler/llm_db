@@ -2,7 +2,7 @@
 
 ## Snapshot-Based Model Data
 
-LLMModels packages a pre-built snapshot at `priv/llm_models/snapshot.json`.
+LLM Models packages a pre-built snapshot at `priv/llm_models/snapshot.json`.
 
 ### Snapshot Structure
 

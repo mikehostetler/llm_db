@@ -6,6 +6,8 @@ defmodule LLMModels.Merge do
   configurable precedence rules. Handles excludes via exact match or glob patterns.
   """
 
+  alias LLMModels.DeepMergeShim
+
   @doc """
   Merges two maps with precedence rules.
 
@@ -59,23 +61,24 @@ defmodule LLMModels.Merge do
     override_map = Map.new(override_providers, fn p -> {Map.get(p, :id), p} end)
 
     Map.merge(base_map, override_map, fn _id, base_provider, override_provider ->
-      DeepMerge.deep_merge(base_provider, override_provider, &provider_merge_resolver/2)
+      DeepMergeShim.deep_merge(base_provider, override_provider, &provider_merge_resolver/3)
     end)
     |> Map.values()
   end
 
-  defp provider_merge_resolver(left_val, right_val)
+  defp provider_merge_resolver(_key, left_val, right_val)
        when is_list(left_val) and is_list(right_val) do
     # For lists: replace (right wins)
     right_val
   end
 
-  defp provider_merge_resolver(left_val, right_val) when is_map(left_val) and is_map(right_val) do
+  defp provider_merge_resolver(_key, left_val, right_val)
+       when is_map(left_val) and is_map(right_val) do
     # For maps: continue deep merge
     DeepMerge.continue_deep_merge()
   end
 
-  defp provider_merge_resolver(_left_val, right_val) do
+  defp provider_merge_resolver(_key, _left_val, right_val) do
     # For scalars: right wins
     right_val
   end

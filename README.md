@@ -1,73 +1,76 @@
-# LLMModels
+# LLM Models
 
 [![Hex.pm](https://img.shields.io/hexpm/v/llm_models.svg)](https://hex.pm/packages/llm_models)
 [![License](https://img.shields.io/hexpm/l/llm_models.svg)](https://github.com/agentjido/llm_models/blob/main/LICENSE)
 
-Fast, persistent_term-backed LLM model metadata catalog with explicit refresh controls.
+LLM model metadata catalog with fast, capability-aware lookups. Use simple `"provider:model"` specs, get validated Provider/Model structs, and select models by capabilities. Ships with a packaged snapshot; no network required by default.
 
-`llm_models` provides a standalone, capability-aware query API for LLM model metadata. It ships with a packaged snapshot, supports manual refresh from [models.dev](https://models.dev), and offers O(1) lock-free queries backed by `:persistent_term`.
-
-## Overview
-
-`llm_models` centralizes model metadata lifecycle (ingest → normalize → validate → enrich → index → publish) behind a simple, reusable library designed for Elixir AI applications like ReqLLM.
-
-### Why LLMModels?
-
-- **Packaged snapshot**: Ships with model data—no network required by default
-- **Fast queries**: O(1), lock-free reads via `:persistent_term`
-- **Explicit refresh**: Manual updates only via `mix llm_models.pull`
-- **Capability-based selection**: Find models by features (tools, JSON mode, streaming, etc.)
-- **Canonical spec parsing**: Owns "provider:model" format parsing and resolution
-- **Flexible data sources**: Configure via pluggable Source modules
-
-### Key Features
-
-- **No magic**: Stability-first design with explicit semantics
-- **Simple allow/deny filtering**: Control which models are available
-- **Precedence rules**: Sources are merged in configuration order (first = lowest, last = highest)
-- **Forward compatible**: Unknown upstream keys pass through to `extra` field
-- **Minimal dependencies**: Only `zoi` (validation) and `jason` (JSON)
+- **Primary interface**: `model_spec` — a string like `"openai:gpt-4o-mini"`
+- **Fast O(1) reads** via `:persistent_term`
+- **Minimal dependencies** (zoi + jason)
 
 ## Installation
 
-Add `llm_models` to your dependencies in `mix.exs`:
+Model metadata is refreshed regularly, so versions follow a date-based format (`YYYY.MM.DD`):
 
 ```elixir
 def deps do
   [
-    {:llm_models, "~> 0.1.0"}
+    {:llm_models, "~> 2025.11.0"}
   ]
 end
+```
+
+## model_spec (the main interface)
+
+A `model_spec` is `"provider:model"` (e.g., `"openai:gpt-4o-mini"`).
+
+Use it to fetch model structs or resolve identifiers. Tuples `{:provider_atom, "id"}` also work, but prefer the string spec.
+
+```elixir
+{:ok, model} = LLMModels.model("openai:gpt-4o-mini")
+#=> %LLMModels.Model{id: "gpt-4o-mini", provider: :openai, ...}
 ```
 
 ## Quick Start
 
 ```elixir
-# Get all providers as structs (catalog loads automatically at startup)
-providers = LLMModels.providers()
-#=> [%LLMModels.Provider{id: :anthropic, ...}, ...]
-
-# Get a specific model
+# Get a model and read metadata
 {:ok, model} = LLMModels.model("openai:gpt-4o-mini")
-#=> {:ok, %LLMModels.Model{id: "gpt-4o-mini", provider: :openai, ...}}
-
-# Access model properties
 model.capabilities.tools.enabled  #=> true
-model.cost.input                  #=> 0.15
-model.limits.context              #=> 128000
+model.cost.input                  #=> 0.15  (per 1M tokens)
+model.limits.context              #=> 128_000
 
-# Find models with specific capabilities
-{:ok, {:openai, "gpt-4o-mini"}} = LLMModels.select(
+# Select a model by capabilities (returns {provider, id})
+{:ok, {provider, id}} = LLMModels.select(
   require: [chat: true, tools: true, json_native: true],
-  prefer: [:openai, :anthropic]
+  prefer:  [:openai, :anthropic]
 )
+{:ok, model} = LLMModels.model({provider, id})
+
+# List providers
+LLMModels.providers()
+#=> [%LLMModels.Provider{id: :anthropic, ...}, %LLMModels.Provider{id: :openai, ...}]
+
+# Check availability (allow/deny filters)
+LLMModels.allowed?("openai:gpt-4o-mini") #=> true
 ```
+
+## API Cheatsheet
+
+- **`model/1`** — `"provider:model"` → `%Model{}`
+- **`select/1`** — pick best `{provider, id}` by capabilities
+- **`providers/0`** — list `%Provider{}` structs
+- **`list_providers/0`** — provider IDs as atoms
+- **`get_provider/1`** — `%Provider{}` by ID
+- **`allowed?/1`** — check availability for a spec or tuple
+- **`reload/0`**, **`epoch/0`**, **`snapshot/0`** — lifecycle utilities
+
+See the full function docs in [hexdocs](https://hexdocs.pm/llm_models).
 
 ## Data Structures
 
-### Provider Struct
-
-The `LLMModels.Provider` struct represents an LLM provider with Zoi validation:
+### Provider
 
 ```elixir
 %LLMModels.Provider{
@@ -76,13 +79,11 @@ The `LLMModels.Provider` struct represents an LLM provider with Zoi validation:
   base_url: "https://api.openai.com",
   env: ["OPENAI_API_KEY"],
   doc: "https://platform.openai.com/docs",
-  extra: %{}  # Additional provider-specific metadata
+  extra: %{}
 }
 ```
 
-### Model Struct
-
-The `LLMModels.Model` struct represents an LLM model with complete metadata:
+### Model
 
 ```elixir
 %LLMModels.Model{
@@ -90,7 +91,7 @@ The `LLMModels.Model` struct represents an LLM model with complete metadata:
   provider: :openai,
   name: "GPT-4o mini",
   family: "gpt-4o",
-  limits: %{context: 128000, output: 16384},
+  limits: %{context: 128_000, output: 16_384},
   cost: %{input: 0.15, output: 0.60},
   capabilities: %{
     chat: true,
@@ -98,427 +99,56 @@ The `LLMModels.Model` struct represents an LLM model with complete metadata:
     json: %{native: true, schema: true},
     streaming: %{text: true, tool_calls: true}
   },
-  tags: ["fast", "efficient"],
+  tags: [],
   deprecated?: false,
-  aliases: ["gpt-4-mini"],
+  aliases: [],
   extra: %{}
 }
 ```
 
-## Usage
-
-### Loading the Catalog
-
-The catalog loads automatically when your application starts. You can also reload it manually:
-
-```elixir
-# Reload with last-known options
-:ok = LLMModels.reload()
-
-# Get current snapshot
-snapshot = LLMModels.snapshot()
-
-# Get current epoch (increments on each load)
-epoch = LLMModels.epoch()
-```
-
-### Querying Providers
-
-```elixir
-# Get all providers as structs
-providers = LLMModels.providers()
-#=> [%LLMModels.Provider{id: :anthropic, ...}, %LLMModels.Provider{id: :openai, ...}]
-
-# Get a specific provider
-{:ok, provider} = LLMModels.get_provider(:openai)
-#=> {:ok, %LLMModels.Provider{...}}
-
-provider.name        #=> "OpenAI"
-provider.base_url    #=> "https://api.openai.com"
-provider.env         #=> ["OPENAI_API_KEY"]
-
-# List provider IDs only
-provider_ids = LLMModels.list_providers()
-#=> [:anthropic, :google_vertex, :openai]
-```
-
-### Querying Models
-
-```elixir
-# Get a model by spec string
-{:ok, model} = LLMModels.model("openai:gpt-4o-mini")
-#=> {:ok, %LLMModels.Model{...}}
-
-# Or by provider and ID
-{:ok, model} = LLMModels.get_model(:openai, "gpt-4o-mini")
-
-# Access model properties
-model.id                    #=> "gpt-4o-mini"
-model.provider              #=> :openai
-model.family                #=> "gpt-4o"
-model.limits.context        #=> 128000
-model.limits.output         #=> 16384
-model.cost.input            #=> 0.15 (per 1M tokens)
-model.cost.output           #=> 0.60 (per 1M tokens)
-model.capabilities.tools.enabled  #=> true
-model.capabilities.json.native    #=> true
-
-# List all models for a provider (returns maps, not structs)
-models = LLMModels.list_models(:openai)
-
-# Filter by capabilities
-models = LLMModels.list_models(:openai,
-  require: [tools: true, json_native: true],
-  forbid: [streaming_tool_calls: true]
-)
-```
-
-### Model Selection
-
-Find the best model matching your criteria:
-
-```elixir
-# Select with capability requirements
-{:ok, {provider, model_id}} = LLMModels.select(
-  require: [chat: true, tools: true, json_native: true],
-  prefer: [:openai, :anthropic]
-)
-
-# Select from specific provider
-{:ok, {provider, model_id}} = LLMModels.select(
-  require: [tools: true],
-  scope: :openai
-)
-
-# Select with forbidden capabilities
-{:ok, {provider, model_id}} = LLMModels.select(
-  require: [chat: true],
-  forbid: [streaming_tool_calls: true],
-  prefer: [:anthropic]
-)
-
-# Handle no match
-case LLMModels.select(require: [impossible: true]) do
-  {:ok, {provider, model_id}} -> # use model
-  {:error, :no_match} -> # fallback
-end
-```
-
-**Supported capability keys:**
-
-- `:chat` - Chat completion support
-- `:embeddings` - Embeddings support
-- `:reasoning` - Extended reasoning capability
-- `:tools` - Tool/function calling
-- `:tools_streaming` - Streaming tool calls
-- `:tools_strict` - Strict tool schemas
-- `:tools_parallel` - Parallel tool execution
-- `:json_native` - Native JSON mode
-- `:json_schema` - JSON schema support
-- `:json_strict` - Strict JSON mode
-- `:streaming_text` - Text streaming
-- `:streaming_tool_calls` - Tool call streaming
-
-### Spec Parsing
-
-Parse and resolve model specifications:
-
-```elixir
-# Parse "provider:model" spec and get Model struct
-{:ok, model} = LLMModels.model("openai:gpt-4o-mini")
-#=> {:ok, %LLMModels.Model{id: "gpt-4o-mini", provider: :openai, ...}}
-
-# Also accepts tuples
-{:ok, model} = LLMModels.model({:openai, "gpt-4o-mini"})
-
-# Parse provider identifier
-{:ok, :openai} = LLMModels.parse_provider("openai")
-{:ok, :google_vertex} = LLMModels.parse_provider("google-vertex")
-{:error, :unknown_provider} = LLMModels.parse_provider("invalid")
-
-# Parse spec to tuple (for backwards compatibility)
-{:ok, {:openai, "gpt-4o-mini"}} = LLMModels.parse_spec("openai:gpt-4o-mini")
-{:error, :invalid_format} = LLMModels.parse_spec("no-colon")
-
-# Resolve spec to full model record (returns map, not struct)
-{:ok, {provider, id, model_map}} = LLMModels.resolve("openai:gpt-4o-mini")
-
-# Handle aliases
-{:ok, model} = LLMModels.model("openai:gpt-4-mini")
-model.id  #=> "gpt-4o-mini" (canonical ID)
-```
-
-### Checking Availability
-
-Use allow/deny filters to control model availability:
-
-```elixir
-# Check if a model is allowed
-true = LLMModels.allowed?({:openai, "gpt-4o-mini"})
-false = LLMModels.allowed?({:openai, "gpt-5-pro"})  # if denied
-
-# Works with spec strings too
-true = LLMModels.allowed?("openai:gpt-4o-mini")
-```
-
 ## Configuration
 
-Configure `llm_models` in your `config/config.exs`:
+The packaged snapshot loads automatically at app start. Optional runtime filters and preferences:
 
 ```elixir
+# config/runtime.exs
 config :llm_models,
-  # Embed snapshot at compile time for zero runtime IO (default: false)
-  compile_embed: true,
-
-  # Configure OPTIONAL data sources (merged on top of packaged snapshot)
-  # Default: [] (only use packaged snapshot - stable, version-pinned)
-  sources: [
-    {LLMModels.Sources.ModelsDev, %{}},
-    {LLMModels.Sources.Local, %{dir: "priv/llm_models"}},
-    {LLMModels.Sources.Config, %{
-      overrides: %{
-        openai: %{
-          env: ["OPENAI_API_KEY"],
-          models: [
-            %{
-              id: "gpt-4o-mini",
-              capabilities: %{
-                tools: %{enabled: true, streaming: false},
-                json: %{native: true}
-              }
-            }
-          ]
-        }
-      }
-    }}
-  ],
-
-  # Global allow/deny filters
-  allow: %{
-    openai: :all,
-    anthropic: ["claude-3-*", "claude-4-*"]
-  },
-  deny: %{
-    openai: ["*-preview"]
-  },
-
-  # Provider preference order
-  prefer: [:openai, :anthropic, :google_vertex]
+  prefer: [:openai, :anthropic],     # provider preference order
+  allow: %{openai: :all},            # allow by provider or wildcard list
+  deny:  %{openai: ["*-preview"]}    # deny patterns override allow
 ```
 
-### Data Sources
+Reload during development:
 
-**By default**, the library uses only the packaged snapshot (stable, version-pinned).
-
-You can configure **optional** sources that merge on top of the packaged base:
-
-- **`LLMModels.Sources.ModelsDev`** - Remote data from models.dev with local caching
-- **`LLMModels.Sources.Local`** - Load from TOML files in a directory
-- **`LLMModels.Sources.Config`** - Provider-keyed config overrides
-
-**Note:** The packaged snapshot is NOT a source - it's the pre-processed base
-that always loads first. Sources provide additional data merged on top.
-
-See the [Sources and Engine](guides/sources-and-engine.md) guide for detailed source documentation.
-
-### Precedence Rules
-
-**Precedence (lowest to highest):**
-1. Packaged snapshot (always loaded)
-2. Configured sources (optional)
-3. Runtime overrides (if provided)
-
-For maps, fields are deep-merged. For lists (except `:aliases`), last wins. For scalars, higher precedence wins.
-
-**Deny always wins over allow.**
+```elixir
+:ok = LLMModels.reload()
+```
 
 ## Updating Model Data
 
-Model data is packaged in the library. To update:
-
-### Pull Latest Data
+Snapshot is shipped with the library. To rebuild with fresh data:
 
 ```bash
-# Fetch from models.dev and cache locally
+# Fetch upstream data (optional)
 mix llm_models.pull
 
-# Fetch from custom URL
-mix llm_models.pull --url https://custom.source/api.json
-```
-
-This downloads upstream data and caches it to `priv/llm_models/upstream/` with HTTP metadata.
-
-### Build Snapshot
-
-```bash
-# Run ETL pipeline to generate snapshot.json
+# Run ETL and write snapshot.json
 mix llm_models.build
 ```
 
-This processes configured sources through the ETL pipeline and writes `priv/llm_models/snapshot.json`.
+See the [Sources & Engine](guides/sources-and-engine.md) guide for details.
 
-### Reload in Development
+## Using with ReqLLM
 
-```elixir
-# Reload catalog without recompiling
-LLMModels.reload()
-```
+Designed to power [ReqLLM](https://github.com/agentjido/req_llm), but fully standalone. Use `model_spec` + `model/1` to retrieve metadata for API calls.
 
-This re-reads the snapshot.json file and updates the `:persistent_term` storage.
+## Docs & Guides
 
-## Release Process
-
-This library uses date-based versioning and `git_ops` for changelog management:
-
-```bash
-# 1. Update version to current date (YYYY.MM.DD format)
-mix llm_models.version
-
-# 2. Generate changelog and create git tag
-mix git_ops.release
-
-# 3. Push to GitHub (triggers CI to publish to Hex)
-git push && git push --tags
-```
-
-The GitHub Actions workflow automatically publishes to Hex.pm when a version tag is pushed.
-
-## Architecture
-
-### ETL Pipeline
-
-The catalog is built through a seven-stage pipeline:
-
-1. **Ingest** - Load from packaged snapshot, config overrides, behaviour overrides
-2. **Normalize** - Convert provider IDs to atoms, standardize dates and formats
-3. **Validate** - Validate via Zoi schemas, drop invalid entries
-4. **Merge** - Apply precedence rules (deep merge maps, dedupe lists)
-5. **Enrich** - Derive `family` from model ID, apply capability defaults
-6. **Filter** - Apply global allow/deny patterns
-7. **Index + Publish** - Build indexes and publish to `:persistent_term`
-
-### Storage
-
-- **Runtime loading**: `LLMModels.load/1` reads snapshot, merges with config overrides, and publishes to `:persistent_term`
-- **Reads**: All queries use `:persistent_term.get(:llm_models_snapshot)` for O(1), lock-free access
-- **No ETS**: Simpler and faster with `:persistent_term`
-- **Optional compile-time embedding**: Set `compile_embed: true` to embed snapshot at compile time (default: false)
-
-### Data Structures
-
-Internally, the snapshot contains:
-
-- `providers_by_id` - Map of provider atoms to provider metadata
-- `models` - Map of provider atoms to lists of models
-- `models_by_key` - Map of `{provider, id}` tuples to model records
-- `aliases_by_key` - Map of `{provider, alias}` to canonical model IDs
-- `filters` - Compiled allow/deny patterns
-
-## Integration with ReqLLM
-
-`llm_models` was designed to power ReqLLM but can be used standalone. The catalog loads automatically when your application starts.
-
-In ReqLLM integration:
-
-```elixir
-# Get model struct
-{:ok, model} = LLMModels.model("openai:gpt-4o-mini")
-
-# Access model properties
-model.capabilities.tools.enabled    #=> true
-model.capabilities.streaming.text   #=> true
-model.cost.input                    #=> 0.15
-
-# Select best model for requirements
-{:ok, {provider, id}} = LLMModels.select(
-  require: [tools: true, streaming_text: true],
-  prefer: [:openai]
-)
-
-# Then get the full model struct
-{:ok, model} = LLMModels.model({provider, id})
-```
-
-## API Reference
-
-### Main Module: `LLMModels`
-
-**Lifecycle:**
-
-- `load/1` - Load catalog and publish to persistent_term
-- `reload/0` - Reload using last-known options
-- `snapshot/0` - Get current snapshot
-- `epoch/0` - Get current epoch
-
-**Lookup and Listing:**
-
-- `providers/0` - Get all providers as Provider structs
-- `list_providers/0` - List provider IDs as atoms
-- `get_provider/1` - Get provider as Provider struct
-- `model/1` - Parse spec and get Model struct
-- `get_model/2` - Get model by provider and ID as Model struct
-- `list_models/2` - List models with filters (returns maps)
-- `capabilities/1` - Get model capabilities map
-- `allowed?/1` - Check if model passes filters
-
-**Selection:**
-
-- `select/1` - Select model by capability requirements
-
-**Spec Parsing:**
-
-- `parse_provider/1` - Parse provider identifier
-- `model/1` - Parse "provider:model" spec
-- `resolve/2` - Resolve spec to model record
-
-### Behaviour: `LLMModels.Source`
-
-**Callbacks:**
-
-- `load/1` - Load provider and model data from the source
-
-See the [Sources and Engine](guides/sources-and-engine.md) guide for detailed source documentation and examples.
-
-### Mix Tasks
-
-- `mix llm_models.pull` - Fetch latest data from models.dev and cache locally
-- `mix llm_models.build` - Run ETL pipeline to generate snapshot.json
-- `mix llm_models.version` - Update version to current date
-
-## Design Principles
-
-1. **Standalone with packaged snapshot** - No network required by default
-2. **Manual refresh only** - Explicit updates via Mix tasks
-3. **O(1) lock-free queries** - Fast reads via `:persistent_term`
-4. **Simple allow/deny filtering** - Clear, compiled-once patterns
-5. **Explicit semantics** - No magic, predictable behavior
-6. **Stability first** - Remove over-engineering, focus on the 80% case
-
-### Simplifications
-
-- No per-field provenance in v1 (may add debug mode later)
-- Dates stored as strings (`"YYYY-MM-DD"`)
-- No DSL for overrides (use behaviour callbacks and plain maps)
-- No schema version juggling (handled by code updates)
-- Selection returns simple match or `:no_match`
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure `mix test` passes
-5. Submit a pull request
+- [Using the Data](guides/using-the-data.md) — Runtime API and querying
+- [Sources & Engine](guides/sources-and-engine.md) — ETL pipeline, data sources, precedence
+- [Schema System](guides/schema-system.md) — Zoi validation and data structures
+- [Release Process](guides/release-process.md) — Snapshot-based releases
 
 ## License
 
 MIT License - see LICENSE file for details.
-
-## Documentation
-
-- [Schema System](guides/schema-system.md) - Zoi validation and data structures
-- [Sources and Engine](guides/sources-and-engine.md) - ETL pipeline and data ingestion
-- [Using the Data](guides/using-the-data.md) - Runtime API and querying
-- [Release Process](guides/release-process.md) - Snapshot-based releases
