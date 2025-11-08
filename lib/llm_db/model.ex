@@ -6,13 +6,70 @@ defmodule LLMDb.Model do
   dates, limits, costs, modalities, capabilities, tags, deprecation status, and aliases.
   """
 
-  require LLMDb.Schema.Capabilities
-  require LLMDb.Schema.Cost
-  require LLMDb.Schema.Limits
+  @limits_schema Zoi.object(%{
+                   context: Zoi.integer() |> Zoi.min(1) |> Zoi.optional(),
+                   output: Zoi.integer() |> Zoi.min(1) |> Zoi.optional()
+                 })
 
-  @limits_schema LLMDb.Schema.Limits.schema()
-  @cost_schema LLMDb.Schema.Cost.schema()
-  @capabilities_schema LLMDb.Schema.Capabilities.schema()
+  @cost_schema Zoi.object(%{
+                 input: Zoi.number() |> Zoi.optional(),
+                 output: Zoi.number() |> Zoi.optional(),
+                 request: Zoi.number() |> Zoi.optional(),
+                 cache_read: Zoi.number() |> Zoi.optional(),
+                 cache_write: Zoi.number() |> Zoi.optional(),
+                 training: Zoi.number() |> Zoi.optional(),
+                 image: Zoi.number() |> Zoi.optional(),
+                 audio: Zoi.number() |> Zoi.optional()
+               })
+
+  @reasoning_schema Zoi.object(%{
+                      enabled: Zoi.boolean() |> Zoi.optional(),
+                      token_budget: Zoi.integer() |> Zoi.min(0) |> Zoi.optional()
+                    })
+
+  @tools_schema Zoi.object(%{
+                  enabled: Zoi.boolean() |> Zoi.optional(),
+                  streaming: Zoi.boolean() |> Zoi.optional(),
+                  strict: Zoi.boolean() |> Zoi.optional(),
+                  parallel: Zoi.boolean() |> Zoi.optional()
+                })
+
+  @json_schema Zoi.object(%{
+                 native: Zoi.boolean() |> Zoi.optional(),
+                 schema: Zoi.boolean() |> Zoi.optional(),
+                 strict: Zoi.boolean() |> Zoi.optional()
+               })
+
+  @streaming_schema Zoi.object(%{
+                      text: Zoi.boolean() |> Zoi.optional(),
+                      tool_calls: Zoi.boolean() |> Zoi.optional()
+                    })
+
+  @embeddings_schema Zoi.object(%{
+                       min_dimensions: Zoi.integer() |> Zoi.min(1) |> Zoi.optional(),
+                       max_dimensions: Zoi.integer() |> Zoi.min(1) |> Zoi.optional(),
+                       default_dimensions: Zoi.integer() |> Zoi.min(1) |> Zoi.optional()
+                     })
+
+  @capabilities_schema Zoi.object(%{
+                         chat: Zoi.boolean() |> Zoi.default(true),
+                         embeddings:
+                           Zoi.union([Zoi.boolean(), @embeddings_schema]) |> Zoi.default(false),
+                         reasoning: @reasoning_schema |> Zoi.default(%{enabled: false}),
+                         tools:
+                           @tools_schema
+                           |> Zoi.default(%{
+                             enabled: false,
+                             streaming: false,
+                             strict: false,
+                             parallel: false
+                           }),
+                         json:
+                           @json_schema
+                           |> Zoi.default(%{native: false, schema: false, strict: false}),
+                         streaming:
+                           @streaming_schema |> Zoi.default(%{text: true, tool_calls: false})
+                       })
 
   @schema Zoi.struct(
             __MODULE__,
@@ -38,7 +95,9 @@ defmodule LLMDb.Model do
               deprecated: Zoi.boolean() |> Zoi.default(false),
               aliases: Zoi.array(Zoi.string()) |> Zoi.default([]),
               extra: Zoi.map() |> Zoi.optional()
-            }, coerce: true)
+            },
+            coerce: true
+          )
 
   @type t :: unquote(Zoi.type_spec(@schema))
 
