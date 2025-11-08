@@ -1,7 +1,7 @@
 defmodule LLMDb.Schema.ModelTest do
   use ExUnit.Case, async: true
 
-  alias LLMDb.Schema.Model
+  alias LLMDb.Model
 
   describe "valid parsing" do
     test "parses minimal valid model" do
@@ -92,73 +92,73 @@ defmodule LLMDb.Schema.ModelTest do
     test "provider_model_id is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :provider_model_id)
+      assert result.provider_model_id == nil
     end
 
     test "name is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :name)
+      assert result.name == nil
     end
 
     test "family is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :family)
+      assert result.family == nil
     end
 
     test "release_date is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :release_date)
+      assert result.release_date == nil
     end
 
     test "last_updated is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :last_updated)
+      assert result.last_updated == nil
     end
 
     test "knowledge is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :knowledge)
+      assert result.knowledge == nil
     end
 
     test "limits is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :limits)
+      assert result.limits == nil
     end
 
     test "cost is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :cost)
+      assert result.cost == nil
     end
 
     test "modalities is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :modalities)
+      assert result.modalities == nil
     end
 
     test "capabilities is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :capabilities)
+      assert result.capabilities == nil
     end
 
     test "tags is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :tags)
+      assert result.tags == nil
     end
 
     test "extra is optional" do
       input = %{id: "gpt-4o", provider: :openai}
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
-      refute Map.has_key?(result, :extra)
+      assert result.extra == nil
     end
   end
 
@@ -306,6 +306,125 @@ defmodule LLMDb.Schema.ModelTest do
       assert {:ok, result} = Zoi.parse(Model.schema(), input)
       assert result.extra["upstream_id"] == "abc123"
       assert result.extra["custom_metadata"] == %{"foo" => "bar"}
+    end
+  end
+
+  describe "cost schema" do
+    test "parses cost with all fields" do
+      input = %{
+        id: "o1",
+        provider: :openai,
+        cost: %{
+          input: 0.15,
+          output: 0.60,
+          request: 0.01,
+          cache_read: 0.015,
+          cache_write: 0.30,
+          training: 3.00,
+          reasoning: 1.00,
+          image: 1.25,
+          audio: 0.50,
+          input_audio: 0.75,
+          output_audio: 2.00,
+          input_video: 1.50,
+          output_video: 3.00
+        }
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost.input == 0.15
+      assert result.cost.output == 0.60
+      assert result.cost.request == 0.01
+      assert result.cost.cache_read == 0.015
+      assert result.cost.cache_write == 0.30
+      assert result.cost.training == 3.00
+      assert result.cost.reasoning == 1.00
+      assert result.cost.image == 1.25
+      assert result.cost.audio == 0.50
+      assert result.cost.input_audio == 0.75
+      assert result.cost.output_audio == 2.00
+      assert result.cost.input_video == 1.50
+      assert result.cost.output_video == 3.00
+    end
+
+    test "parses cost with only reasoning" do
+      input = %{
+        id: "o1",
+        provider: :openai,
+        cost: %{reasoning: 1.00}
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost.reasoning == 1.00
+    end
+
+    test "parses cost with audio fields" do
+      input = %{
+        id: "gemini-2.5-flash",
+        provider: :google,
+        cost: %{
+          input: 0.15,
+          output: 0.60,
+          input_audio: 0.75,
+          output_audio: 2.00
+        }
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost.input == 0.15
+      assert result.cost.output == 0.60
+      assert result.cost.input_audio == 0.75
+      assert result.cost.output_audio == 2.00
+    end
+
+    test "parses cost with video fields" do
+      input = %{
+        id: "test-model",
+        provider: :test,
+        cost: %{
+          input_video: 1.50,
+          output_video: 3.00
+        }
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost.input_video == 1.50
+      assert result.cost.output_video == 3.00
+    end
+
+    test "all cost fields are optional" do
+      input = %{
+        id: "test-model",
+        provider: :test,
+        cost: %{}
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost == %{}
+    end
+
+    test "accepts integer cost values" do
+      input = %{
+        id: "test-model",
+        provider: :test,
+        cost: %{input: 1, output: 2}
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost.input == 1
+      assert result.cost.output == 2
+    end
+
+    test "accepts zero cost values" do
+      input = %{
+        id: "test-model",
+        provider: :test,
+        cost: %{input: 0.0, reasoning: 0.0}
+      }
+
+      assert {:ok, result} = Zoi.parse(Model.schema(), input)
+      assert result.cost.input == 0.0
+      assert result.cost.reasoning == 0.0
     end
   end
 end
