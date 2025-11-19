@@ -5,9 +5,6 @@ defmodule LLMDB.EngineOverrideTest do
 
   setup do
     Store.clear!()
-    Application.delete_env(:llm_db, :allow)
-    Application.delete_env(:llm_db, :deny)
-    Application.delete_env(:llm_db, :prefer)
     :ok
   end
 
@@ -29,12 +26,13 @@ defmodule LLMDB.EngineOverrideTest do
     {filters, _unknown_info} =
       case Keyword.get(opts, :filters) do
         nil ->
-          Config.compile_filters(config.allow, config.deny, provider_ids)
+          # Default to permissive filters for tests, ignoring global config to avoid race conditions
+          Config.compile_filters(:all, %{}, provider_ids)
 
         filter_opts ->
           Config.compile_filters(
-            Map.get(filter_opts, :allow, config.allow),
-            Map.get(filter_opts, :deny, config.deny),
+            Map.get(filter_opts, :allow, :all),
+            Map.get(filter_opts, :deny, %{}),
             provider_ids
           )
       end

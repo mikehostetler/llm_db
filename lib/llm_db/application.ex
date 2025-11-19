@@ -20,12 +20,16 @@ defmodule LLMDB.Application do
     # Ensure provider atoms exist before loading snapshot
     _ = LLMDB.Generated.ValidProviders.list()
 
-    case LLMDB.load() do
-      {:ok, _snapshot} ->
-        {:ok, self()}
+    if Application.get_env(:llm_db, :skip_packaged_load, false) do
+      {:ok, self()}
+    else
+      case LLMDB.load() do
+        {:ok, _snapshot} ->
+          {:ok, self()}
 
-      {:error, reason} ->
-        {:error, reason}
+        {:error, reason} ->
+          {:error, reason}
+      end
     end
   end
 

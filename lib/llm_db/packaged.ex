@@ -129,6 +129,10 @@ defmodule LLMDB.Packaged do
     """
     @spec snapshot() :: map() | nil
     def snapshot do
+      # Defensive: ensure provider atoms exist even if Application.start wasn’t run
+      _ = Code.ensure_loaded?(LLMDB.Generated.ValidProviders)
+      _ = LLMDB.Generated.ValidProviders.list()
+
       with {:ok, manifest_content} <- File.read(manifest_path()),
            :ok <- verify_integrity(manifest_content),
            manifest <- Jason.decode!(manifest_content, keys: :atoms),
