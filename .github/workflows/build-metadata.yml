@@ -1,4 +1,4 @@
-name: Build Metadata
+name: Refresh Upstream Metadata
 
 on:
   schedule:
