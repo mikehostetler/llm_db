@@ -133,14 +133,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Use stable branch - create from main or reset existing
+          # Stage all changes first (before branch switch)
+          git add priv/llm_db/
+          git add lib/llm_db/generated/
+
+          # Stash changes, switch to clean branch, then apply
+          git stash
           git fetch origin "$BRANCH_NAME" 2>/dev/null || true
           git branch -D "$BRANCH_NAME" 2>/dev/null || true
           git checkout -b "$BRANCH_NAME"
-
-          # Stage changes
-          git add priv/llm_db/
-          git add lib/llm_db/generated/
+          git stash pop
 
           # Check if there are staged changes to commit
           if git diff --cached --quiet; then
