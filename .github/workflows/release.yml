@@ -3,6 +3,11 @@ name: Release to Hex
 on:
   workflow_dispatch:
     inputs:
+      dry_run:
+        description: "Dry run (no publish, no tag, no push)"
+        required: false
+        type: boolean
+        default: false
       skip_tests:
         description: "Skip tests before release"
         required: false
@@ -67,11 +72,13 @@ jobs:
           echo "### Version: $VERSION" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Generate changelog and create tag
+        if: ${{ inputs.dry_run != true }}
         run: |
           set -euo pipefail
           mix git_ops.release --yes
 
       - name: Push changes and tags
+        if: ${{ inputs.dry_run != true }}
         run: |
           set -euo pipefail
           git push origin main
@@ -82,12 +89,18 @@ jobs:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
         run: |
           set -euo pipefail
-          mix hex.publish --yes
-          echo "### Published to Hex.pm" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "### Dry Run - Would publish:" >> "$GITHUB_STEP_SUMMARY"
+            mix hex.publish --dry-run
+          else
+            mix hex.publish --yes
+            echo "### Published to Hex.pm" >> "$GITHUB_STEP_SUMMARY"
+          fi
           echo "- Package: llm_db" >> "$GITHUB_STEP_SUMMARY"
           echo "- Version: ${{ steps.version.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create GitHub release
+        if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
