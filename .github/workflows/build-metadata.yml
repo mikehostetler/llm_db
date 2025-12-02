@@ -19,12 +19,17 @@ jobs:
   update-metadata:
     name: Pull and update LLM model metadata
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: llm-metadata
+      cancel-in-progress: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
@@ -38,14 +43,13 @@ jobs:
           path: |
             deps
             _build
-          key: ${{ runner.os }}-mix-1.16-26-${{ hashFiles('**/mix.lock') }}
+          key: mix-${{ runner.os }}-elixir-1.16-otp-26-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
-            ${{ runner.os }}-mix-1.16-26-
+            mix-${{ runner.os }}-elixir-1.16-otp-26-
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
+          set -euo pipefail
           mix deps.get
 
       - name: Pull latest metadata from sources
@@ -55,6 +59,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
         run: |
+          set -euo pipefail
           echo "Pulling latest LLM model metadata..."
           mix llm_db.pull
           mix llm_db.build
@@ -62,15 +67,22 @@ jobs:
       - name: Check for changes
         id: changes
         run: |
-          if [ "${{ inputs.force_update }}" = "true" ]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          FORCE="${{ inputs.force_update || 'false' }}"
+
+          if [ "$FORCE" = "true" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
             echo "Force update enabled - proceeding with PR creation"
-          elif git diff --quiet priv/llm_db/ lib/llm_db/generated/; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected in metadata files"
-          else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if git status --porcelain priv/llm_db lib/llm_db/generated | grep -q .; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
             echo "Changes detected in metadata files"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected in metadata files"
           fi
 
       - name: Generate summary and create PR
@@ -78,8 +90,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+
           MANIFEST_FILE="priv/llm_db/manifest.json"
           OUTPUT_FILE="/tmp/metadata_summary.md"
+          BRANCH_NAME="metadata-update"
 
           echo "## Model Metadata Update" > "$OUTPUT_FILE"
           echo "" >> "$OUTPUT_FILE"
@@ -87,49 +102,72 @@ jobs:
           echo "" >> "$OUTPUT_FILE"
 
           if [ -f "$MANIFEST_FILE" ]; then
-            PROVIDER_COUNT=$(jq '.providers | length' "$MANIFEST_FILE")
-            GENERATED_AT=$(jq -r '.generated_at' "$MANIFEST_FILE")
-            MODEL_COUNT=$(find priv/llm_db/providers -name "*.json" -exec jq '.models | length' {} \; | awk '{s+=$1} END {print s}')
+            if ! jq empty "$MANIFEST_FILE" >/dev/null 2>&1; then
+              echo "Warning: manifest.json is not valid JSON" >> "$OUTPUT_FILE"
+            else
+              PROVIDER_COUNT=$(jq '.providers | length' "$MANIFEST_FILE")
+              GENERATED_AT=$(jq -r '.generated_at' "$MANIFEST_FILE" || echo "unknown")
+              MODEL_COUNT=$(find priv/llm_db/providers -name "*.json" -print0 \
+                | xargs -0 -r jq '.models | length' 2>/dev/null \
+                | awk '{s+=$1} END {print s+0}')
 
-            echo "### Summary" >> "$OUTPUT_FILE"
-            echo "" >> "$OUTPUT_FILE"
-            echo "- Providers: $PROVIDER_COUNT" >> "$OUTPUT_FILE"
-            echo "- Models: $MODEL_COUNT" >> "$OUTPUT_FILE"
-            echo "- Generated: $GENERATED_AT" >> "$OUTPUT_FILE"
-            echo "" >> "$OUTPUT_FILE"
+              echo "### Summary" >> "$OUTPUT_FILE"
+              echo "" >> "$OUTPUT_FILE"
+              echo "- Providers: $PROVIDER_COUNT" >> "$OUTPUT_FILE"
+              echo "- Models: $MODEL_COUNT" >> "$OUTPUT_FILE"
+              echo "- Generated: $GENERATED_AT" >> "$OUTPUT_FILE"
+              echo "" >> "$OUTPUT_FILE"
+            fi
           fi
 
           echo "### Changed Files" >> "$OUTPUT_FILE"
           echo "" >> "$OUTPUT_FILE"
           echo "\`\`\`" >> "$OUTPUT_FILE"
-          git diff --stat priv/llm_db/ lib/llm_db/generated/ >> "$OUTPUT_FILE"
+          git diff --stat priv/llm_db/ lib/llm_db/generated/ >> "$OUTPUT_FILE" || true
           echo "\`\`\`" >> "$OUTPUT_FILE"
 
-          # Create branch and commit
-          BRANCH_NAME="metadata-update-${{ github.run_number }}"
+          # Show summary in Actions UI
+          cat "$OUTPUT_FILE" >> "$GITHUB_STEP_SUMMARY"
 
+          # Configure git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git checkout -b "$BRANCH_NAME"
+          # Use stable branch - check if it exists on remote
+          if git ls-remote --exit-code --heads origin "$BRANCH_NAME" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH_NAME"
+            git checkout "$BRANCH_NAME"
+            git reset --hard origin/main
+          else
+            git checkout -b "$BRANCH_NAME"
+          fi
+
+          # Stage and commit changes
           git add priv/llm_db/
           git add lib/llm_db/generated/
 
           git commit -m "Update model metadata" \
                      -m "Automated metadata update from upstream sources"
 
-          git push origin "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME" --force-with-lease
 
-          # Create PR
+          # Create PR only if one doesn't exist
           TITLE="Update model metadata - $(date +%Y-%m-%d)"
-          gh pr create \
-            --base main \
-            --head "$BRANCH_NAME" \
-            --title "$TITLE" \
-            --body-file "$OUTPUT_FILE"
+          if gh pr view "$BRANCH_NAME" >/dev/null 2>&1; then
+            echo "PR for $BRANCH_NAME already exists; updated branch with latest changes."
+            gh pr edit "$BRANCH_NAME" --title "$TITLE" --body-file "$OUTPUT_FILE"
+          else
+            gh pr create \
+              --base main \
+              --head "$BRANCH_NAME" \
+              --title "$TITLE" \
+              --body-file "$OUTPUT_FILE"
+          fi
 
       - name: Report no changes
         if: steps.changes.outputs.has_changes == 'false'
         run: |
           echo "No metadata changes detected. Skipping PR creation."
           echo "All model metadata is up to date."
+          echo "### No Changes Detected" >> "$GITHUB_STEP_SUMMARY"
+          echo "All model metadata is up to date." >> "$GITHUB_STEP_SUMMARY"
