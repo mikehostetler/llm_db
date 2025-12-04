@@ -76,6 +76,14 @@ jobs:
           VERSION=$(grep -oP '@version "\K[^"]+' mix.exs)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "### Version: $VERSION" >> "$GITHUB_STEP_SUMMARY"
+          
+          # Commit version bump with conventional commit format
+          if git diff --quiet mix.exs; then
+            echo "Version already up to date"
+          else
+            git add mix.exs
+            git commit -m "chore: bump version to $VERSION"
+          fi
 
       - name: Generate changelog and create tag
         if: ${{ inputs.dry_run != true }}
@@ -83,7 +91,7 @@ jobs:
           MIX_ENV: dev
         run: |
           set -euo pipefail
-          mix git_ops.release --yes --force-patch
+          mix git_ops.release --yes
 
       - name: Push changes and tags
         if: ${{ inputs.dry_run != true }}
