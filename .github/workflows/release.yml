@@ -91,7 +91,7 @@ jobs:
           MIX_ENV: dev
         run: |
           set -euo pipefail
-          mix git_ops.release --yes
+          mix git_ops.release --yes --force-patch
 
       - name: Push changes and tags
         if: ${{ inputs.dry_run != true }}
