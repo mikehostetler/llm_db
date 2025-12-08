@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-12-05T15:06:06.792546Z",
+  "generated_at": "2025-12-08T00:12:48.622023Z",
   "providers": [
     "ai21",
     "aihubmix",
@@ -23,6 +23,7 @@
     "bytedance",
     "cerebras",
     "chutes",
+    "cloudflare_ai_gateway",
     "cloudflare_workers_ai",
     "cognitivecomputations",
     "cohere",
