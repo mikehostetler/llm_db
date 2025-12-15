@@ -71,6 +71,7 @@
       "extra": {
         "attachment": false,
         "created": 1743724800,
+        "family": "grok-3",
         "open_weights": false,
         "owned_by": "xai",
         "temperature": true
@@ -127,6 +128,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -182,6 +184,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -237,6 +240,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -298,6 +302,7 @@
       "extra": {
         "attachment": false,
         "created": 1743724800,
+        "family": "grok-3",
         "open_weights": false,
         "owned_by": "xai",
         "temperature": true
@@ -359,6 +364,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -419,6 +425,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -479,6 +486,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -539,6 +547,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -617,6 +626,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -673,6 +683,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -733,6 +744,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -791,6 +803,7 @@
       "extra": {
         "attachment": false,
         "created": 1756944000,
+        "family": "grok",
         "open_weights": false,
         "owned_by": "xai",
         "temperature": true
@@ -911,6 +924,7 @@
       "extra": {
         "attachment": false,
         "created": 1755993600,
+        "family": "grok",
         "open_weights": false,
         "owned_by": "xai",
         "temperature": true

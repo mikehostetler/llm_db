@@ -69,6 +69,7 @@
       "extra": {
         "attachment": true,
         "description": "Latest release of Gemini Flash",
+        "family": "gemini-flash",
         "max_temperature": 2,
         "open_weights": false,
         "structured_output": true,
@@ -694,6 +695,7 @@
       "extra": {
         "attachment": true,
         "description": "Preview release (April 17th, 2025) of Gemini 2.5 Flash",
+        "family": "gemini-flash",
         "max_temperature": 2,
         "open_weights": false,
         "structured_output": true,
@@ -1503,6 +1505,7 @@
       "extra": {
         "attachment": false,
         "description": "Obtain a distributed representation of a text.",
+        "family": "gemini",
         "open_weights": false,
         "reasoning": false,
         "supported_generation_methods": [
@@ -1657,6 +1660,7 @@
       "extra": {
         "attachment": true,
         "description": "Gemini 2.0 Flash",
+        "family": "gemini-flash",
         "max_temperature": 2,
         "open_weights": false,
         "structured_output": true,
@@ -1911,6 +1915,7 @@
       "extra": {
         "attachment": true,
         "description": "Stable version of Gemini 2.5 Flash, our mid-size multimodal model that supports up to 1 million tokens, released in June of 2025.",
+        "family": "gemini-flash",
         "hugging_face_id": "",
         "max_temperature": 2,
         "open_weights": false,
@@ -1988,6 +1993,7 @@
       "extra": {
         "attachment": true,
         "description": "Gemini 3 Pro Preview",
+        "family": "gemini-pro",
         "hugging_face_id": "",
         "max_temperature": 2,
         "open_weights": false,
@@ -2102,6 +2108,7 @@
       "extra": {
         "attachment": true,
         "description": "Stable release (June 17th, 2025) of Gemini 2.5 Pro",
+        "family": "gemini-pro",
         "hugging_face_id": "",
         "max_temperature": 2,
         "open_weights": false,
@@ -2209,6 +2216,7 @@
       "extra": {
         "attachment": true,
         "description": "Gemini 2.0 Flash-Lite",
+        "family": "gemini-flash-lite",
         "max_temperature": 2,
         "open_weights": false,
         "structured_output": true,

@@ -37,6 +37,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "claude-sonnet",
         "open_weights": false,
         "temperature": true
       },
@@ -52,7 +53,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -92,6 +94,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "claude-sonnet",
         "open_weights": false,
         "temperature": true
       },
@@ -107,7 +110,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -147,6 +151,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "deepseek-v3",
         "open_weights": true,
         "temperature": true
       },
@@ -201,6 +206,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gemini-pro",
         "open_weights": false,
         "temperature": true
       },
@@ -256,6 +262,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-4.1",
         "open_weights": false,
         "temperature": true
       },
@@ -311,6 +318,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-oss",
         "open_weights": true,
         "temperature": true
       },
@@ -365,6 +373,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "kimi-k2",
         "open_weights": true,
         "temperature": true
       },
@@ -419,6 +428,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3.1",
         "open_weights": true,
         "temperature": true
       },
@@ -473,6 +483,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "nova-pro",
         "open_weights": false,
         "temperature": true
       },
@@ -528,6 +539,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "qwen3",
         "open_weights": true,
         "temperature": true
       },
@@ -582,6 +594,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "qwen3-coder",
         "open_weights": true,
         "temperature": true
       },

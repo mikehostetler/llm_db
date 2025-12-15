@@ -39,6 +39,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "o3",
         "open_weights": false,
         "temperature": false
       },
@@ -95,6 +96,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4.1-mini",
         "open_weights": false,
         "temperature": true
       },
@@ -152,6 +154,7 @@
       "extra": {
         "api": "responses",
         "attachment": false,
+        "family": "gpt-5-codex",
         "open_weights": false,
         "temperature": false
       },
@@ -190,6 +193,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3",
         "open_weights": true,
         "temperature": true
       },
@@ -227,6 +231,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3",
         "open_weights": true,
         "temperature": true
       },
@@ -283,6 +288,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "deepseek-v3",
         "open_weights": true,
         "temperature": true
       },
@@ -338,6 +344,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "o1-mini",
         "open_weights": false,
         "temperature": false
       },
@@ -392,6 +399,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "llama-4-scout",
         "open_weights": true,
         "temperature": true
       },
@@ -449,6 +457,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "claude-sonnet",
         "open_weights": false,
         "provider": {
           "npm": "@ai-sdk/anthropic"
@@ -468,7 +477,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -491,6 +501,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3",
         "open_weights": true,
         "temperature": true
       },
@@ -516,6 +527,63 @@
       "provider": "azure",
       "provider_model_id": null,
       "release_date": "2024-04-23",
+      "tags": null
+    },
+    "gpt-5.2": {
+      "aliases": [],
+      "capabilities": {
+        "chat": true,
+        "embeddings": false,
+        "json": {
+          "native": false,
+          "schema": false,
+          "strict": false
+        },
+        "reasoning": {
+          "enabled": true
+        },
+        "streaming": {
+          "tool_calls": true
+        },
+        "tools": {
+          "enabled": true
+        }
+      },
+      "cost": {
+        "cache_read": 0.125,
+        "input": 1.75,
+        "output": 14
+      },
+      "deprecated": false,
+      "extra": {
+        "attachment": true,
+        "family": "gpt-5",
+        "open_weights": false,
+        "temperature": false
+      },
+      "family": null,
+      "id": "gpt-5.2",
+      "knowledge": "2025-08-31",
+      "last_updated": "2025-12-11",
+      "lifecycle": null,
+      "limits": {
+        "context": 400000,
+        "output": 128000
+      },
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "model": null,
+      "name": "GPT-5.2",
+      "provider": "azure",
+      "provider_model_id": null,
+      "release_date": "2025-12-11",
       "tags": null
     },
     "mistral-medium-2505": {
@@ -545,6 +613,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "mistral-medium",
         "open_weights": false,
         "temperature": true
       },
@@ -583,6 +652,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3",
         "open_weights": true,
         "temperature": true
       },
@@ -638,6 +708,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -676,6 +747,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-3.5-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -731,6 +803,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-5",
         "open_weights": false,
         "temperature": false
       },
@@ -769,6 +842,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3",
         "open_weights": true,
         "temperature": true
       },
@@ -823,6 +897,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-4",
         "open_weights": true,
         "temperature": true
       },
@@ -879,6 +954,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "claude-opus",
         "open_weights": false,
         "provider": {
           "npm": "@ai-sdk/anthropic"
@@ -898,7 +974,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -940,6 +1017,7 @@
       "extra": {
         "api": "responses",
         "attachment": false,
+        "family": "gpt-5-codex",
         "open_weights": false,
         "temperature": false
       },
@@ -998,6 +1076,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "ministral-3b",
         "open_weights": true,
         "temperature": true
       },
@@ -1053,6 +1132,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-5-mini",
         "open_weights": false,
         "temperature": false
       },
@@ -1109,6 +1189,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "o3-mini",
         "open_weights": false,
         "temperature": false
       },
@@ -1163,6 +1244,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "command-a",
         "open_weights": true,
         "temperature": true
       },
@@ -1217,6 +1299,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-4",
         "open_weights": true,
         "temperature": true
       },
@@ -1244,6 +1327,63 @@
       "release_date": "2024-12-11",
       "tags": null
     },
+    "gpt-5-pro": {
+      "aliases": [],
+      "capabilities": {
+        "chat": true,
+        "embeddings": false,
+        "json": {
+          "native": false,
+          "schema": false,
+          "strict": false
+        },
+        "reasoning": {
+          "enabled": true
+        },
+        "streaming": {
+          "tool_calls": true
+        },
+        "tools": {
+          "enabled": true
+        }
+      },
+      "cost": {
+        "input": 15,
+        "output": 120
+      },
+      "deprecated": false,
+      "extra": {
+        "attachment": true,
+        "family": "gpt-5-pro",
+        "open_weights": false,
+        "structured_output": true,
+        "temperature": false
+      },
+      "family": null,
+      "id": "gpt-5-pro",
+      "knowledge": "2024-09-30",
+      "last_updated": "2025-10-06",
+      "lifecycle": null,
+      "limits": {
+        "context": 400000,
+        "output": 272000
+      },
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "model": null,
+      "name": "GPT-5 Pro",
+      "provider": "azure",
+      "provider_model_id": null,
+      "release_date": "2025-10-06",
+      "tags": null
+    },
     "gpt-3.5-turbo-0301": {
       "aliases": [],
       "capabilities": null,
@@ -1254,6 +1394,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-3.5-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -1308,6 +1449,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3.1",
         "open_weights": true,
         "temperature": true
       },
@@ -1363,6 +1505,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "o1-preview",
         "open_weights": false,
         "temperature": false
       },
@@ -1417,6 +1560,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "command-r-plus",
         "open_weights": true,
         "temperature": true
       },
@@ -1472,6 +1616,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "o4-mini",
         "open_weights": false,
         "temperature": false
       },
@@ -1527,6 +1672,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "command-r",
         "open_weights": true,
         "temperature": true
       },
@@ -1583,6 +1729,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "deepseek-r1",
         "open_weights": true,
         "temperature": true
       },
@@ -1637,6 +1784,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "model-router",
         "open_weights": false
       },
       "family": null,
@@ -1692,6 +1840,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-5-nano",
         "open_weights": false,
         "temperature": false
       },
@@ -1747,6 +1896,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "llama-3.2",
         "open_weights": true,
         "temperature": true
       },
@@ -1785,6 +1935,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3",
         "open_weights": true,
         "temperature": true
       },
@@ -1843,6 +1994,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "mai-ds-r1",
         "open_weights": false,
         "temperature": true
       },
@@ -1897,6 +2049,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3.1",
         "open_weights": true,
         "temperature": true
       },
@@ -1934,6 +2087,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3.5",
         "open_weights": true,
         "temperature": true
       },
@@ -1988,6 +2142,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-4",
         "open_weights": false,
         "temperature": true
       },
@@ -2043,6 +2198,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4o",
         "open_weights": false,
         "temperature": true
       },
@@ -2099,6 +2255,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -2126,6 +2283,64 @@
       "release_date": "2025-08-28",
       "tags": null
     },
+    "gpt-5.1-codex-max": {
+      "aliases": [],
+      "capabilities": {
+        "chat": true,
+        "embeddings": false,
+        "json": {
+          "native": false,
+          "schema": false,
+          "strict": false
+        },
+        "reasoning": {
+          "enabled": true
+        },
+        "streaming": {
+          "tool_calls": true
+        },
+        "tools": {
+          "enabled": true
+        }
+      },
+      "cost": {
+        "cache_read": 0.125,
+        "input": 1.25,
+        "output": 10
+      },
+      "deprecated": false,
+      "extra": {
+        "attachment": true,
+        "family": "gpt-5-codex-max",
+        "open_weights": false,
+        "structured_output": true,
+        "temperature": false
+      },
+      "family": null,
+      "id": "gpt-5.1-codex-max",
+      "knowledge": "2024-09-30",
+      "last_updated": "2025-11-13",
+      "lifecycle": null,
+      "limits": {
+        "context": 400000,
+        "output": 128000
+      },
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "model": null,
+      "name": "GPT-5.1 Codex Max",
+      "provider": "azure",
+      "provider_model_id": null,
+      "release_date": "2025-11-13",
+      "tags": null
+    },
     "gpt-3.5-turbo-1106": {
       "aliases": [],
       "capabilities": null,
@@ -2136,6 +2351,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-3.5-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -2194,6 +2410,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "deepseek-r1",
         "open_weights": true,
         "temperature": true
       },
@@ -2232,6 +2449,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "phi-4",
         "open_weights": true,
         "temperature": true
       },
@@ -2289,6 +2507,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4.1-nano",
         "open_weights": false,
         "temperature": true
       },
@@ -2345,6 +2564,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "o1",
         "open_weights": false,
         "temperature": false
       },
@@ -2402,6 +2622,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "deepseek-v3",
         "open_weights": true,
         "temperature": true
       },
@@ -2458,6 +2679,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "claude-opus",
         "open_weights": false,
         "provider": {
           "npm": "@ai-sdk/anthropic"
@@ -2476,7 +2698,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -2516,6 +2739,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -2554,6 +2778,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "cohere-embed",
         "open_weights": true,
         "temperature": false
       },
@@ -2591,6 +2816,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3",
         "open_weights": true,
         "temperature": true
       },
@@ -2647,6 +2873,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -2709,6 +2936,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "text-embedding-3-small",
         "open_weights": false,
         "type": "embedding"
       },
@@ -2764,6 +2992,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "llama-3.2",
         "open_weights": true,
         "temperature": true
       },
@@ -2821,6 +3050,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -2875,6 +3105,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "mistral-nemo",
         "open_weights": true,
         "temperature": true
       },
@@ -2912,6 +3143,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3",
         "open_weights": true,
         "temperature": true
       },
@@ -2967,6 +3199,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-5-chat",
         "open_weights": false,
         "temperature": false
       },
@@ -3033,6 +3266,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "text-embedding-ada",
         "open_weights": false,
         "type": "embedding"
       },
@@ -3088,6 +3322,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "mistral-large",
         "open_weights": false,
         "temperature": true
       },
@@ -3142,6 +3377,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "mistral-small",
         "open_weights": false,
         "temperature": true
       },
@@ -3180,6 +3416,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-3.5-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -3235,6 +3472,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "grok-3",
         "open_weights": false,
         "temperature": true
       },
@@ -3272,6 +3510,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-3.5-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -3326,6 +3565,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3.3",
         "open_weights": true,
         "temperature": true
       },
@@ -3363,6 +3603,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "cohere-embed",
         "open_weights": true,
         "temperature": false
       },
@@ -3423,6 +3664,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-5-chat",
         "open_weights": false,
         "temperature": false
       },
@@ -3482,6 +3724,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-4",
         "open_weights": true,
         "temperature": true
       },
@@ -3519,6 +3762,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "cohere-embed",
         "open_weights": true,
         "temperature": false
       },
@@ -3577,6 +3821,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-4",
         "open_weights": true,
         "temperature": true
       },
@@ -3631,6 +3876,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4-turbo",
         "open_weights": false,
         "temperature": true
       },
@@ -3686,6 +3932,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "codestral",
         "open_weights": false,
         "temperature": true
       },
@@ -3740,6 +3987,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "gpt-4",
         "open_weights": false,
         "temperature": true
       },
@@ -3777,6 +4025,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-3.5",
         "open_weights": true,
         "temperature": true
       },
@@ -3833,6 +4082,7 @@
       "extra": {
         "api": "responses",
         "attachment": true,
+        "family": "codex",
         "open_weights": false,
         "temperature": false
       },
@@ -3887,6 +4137,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "llama-4-maverick",
         "open_weights": true,
         "temperature": true
       },
@@ -3943,6 +4194,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4.1",
         "open_weights": false,
         "temperature": true
       },
@@ -4000,6 +4252,7 @@
       "extra": {
         "api": "responses",
         "attachment": false,
+        "family": "gpt-5-codex-mini",
         "open_weights": false,
         "temperature": false
       },
@@ -4058,6 +4311,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "llama-3.1",
         "open_weights": true,
         "temperature": true
       },
@@ -4120,6 +4374,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "text-embedding-3-large",
         "open_weights": false,
         "type": "embedding"
       },
@@ -4158,6 +4413,7 @@
       "deprecated": false,
       "extra": {
         "attachment": false,
+        "family": "phi-4",
         "open_weights": true,
         "temperature": true
       },
@@ -4213,6 +4469,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-4o-mini",
         "open_weights": false,
         "temperature": true
       },
@@ -4270,6 +4527,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "claude-haiku",
         "open_weights": false,
         "provider": {
           "npm": "@ai-sdk/anthropic"
@@ -4289,7 +4547,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -4330,6 +4589,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "grok",
         "open_weights": false,
         "temperature": true
       },
@@ -4386,6 +4646,7 @@
       "deprecated": false,
       "extra": {
         "attachment": true,
+        "family": "gpt-5",
         "open_weights": false,
         "temperature": false
       },
